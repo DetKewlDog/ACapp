@@ -12,11 +12,16 @@ namespace ACapp
         Button btnMinus, btnPlus, btnSettings, btnDone;
         TextView tvTemp, tvMin, tvMax;
         EditText etMin, etMax;
-        int minTemp = 16, maxTemp = 32, currentTemp = 20;
+        int minTemp, maxTemp, currentTemp;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+
+            minTemp = Xamarin.Essentials.Preferences.Get("min", 16);
+            maxTemp = Xamarin.Essentials.Preferences.Get("max", 32);
+            currentTemp = Xamarin.Essentials.Preferences.Get("current", 20);
+
             OpenMain();
         }
 
@@ -62,6 +67,9 @@ namespace ACapp
                 minTemp = _min;
                 maxTemp = _max;
 
+                Xamarin.Essentials.Preferences.Set("min", minTemp);
+                Xamarin.Essentials.Preferences.Set("max", maxTemp);
+
                 OpenMain();
             };
         }
@@ -69,6 +77,7 @@ namespace ACapp
         protected void SetTemperature(int temp) {
             if (temp < minTemp || temp > maxTemp) return;
             currentTemp = temp;
+            Xamarin.Essentials.Preferences.Set("current", currentTemp);
             tvTemp.Text = IntToCelsius(currentTemp);
         }
 
