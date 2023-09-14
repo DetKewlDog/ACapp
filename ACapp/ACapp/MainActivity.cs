@@ -9,6 +9,7 @@ namespace ACapp
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+        ISharedPreferences prefs;
         Button btnMinus, btnPlus, btnSettings, btnDone;
         TextView tvTemp, tvMin, tvMax;
         EditText etMin, etMax;
@@ -18,9 +19,11 @@ namespace ACapp
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
 
-            minTemp = Xamarin.Essentials.Preferences.Get("min", 16);
-            maxTemp = Xamarin.Essentials.Preferences.Get("max", 32);
-            currentTemp = Xamarin.Essentials.Preferences.Get("current", 20);
+            prefs = Application.Context.GetSharedPreferences("prefs", FileCreationMode.Private);  
+
+            minTemp = prefs.GetInt("min", 16);
+            maxTemp = prefs.GetInt("max", 32);
+            currentTemp = prefs.GetInt("current", 20);
 
             OpenMain();
         }
@@ -67,8 +70,10 @@ namespace ACapp
                 minTemp = _min;
                 maxTemp = _max;
 
-                Xamarin.Essentials.Preferences.Set("min", minTemp);
-                Xamarin.Essentials.Preferences.Set("max", maxTemp);
+                ISharedPreferencesEditor edit = prefs.Edit();
+                edit.PutInt("min", minTemp);
+                edit.PutInt("max", maxTemp);
+                edit.Apply();
 
                 OpenMain();
             };
@@ -77,7 +82,9 @@ namespace ACapp
         protected void SetTemperature(int temp) {
             if (temp < minTemp || temp > maxTemp) return;
             currentTemp = temp;
-            Xamarin.Essentials.Preferences.Set("current", currentTemp);
+            ISharedPreferencesEditor edit = prefs.Edit();
+            edit.PutInt("current", currentTemp);
+            edit.Apply();
             tvTemp.Text = IntToCelsius(currentTemp);
         }
 
